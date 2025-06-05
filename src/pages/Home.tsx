@@ -1,123 +1,130 @@
 
-import { AlbumCard } from "@/components/AlbumCard";
-import { PlaylistCard } from "@/components/PlaylistCard";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Search, MapPin, Star, Wifi, Car, Dumbbell } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUniversity } from "@/contexts/UniversityContext";
+import { useHostel } from "@/contexts/HostelContext";
+import { HostelCard } from "@/components/HostelCard";
+import { UniversitySelector } from "@/components/UniversitySelector";
 
 export default function Home() {
   const { user } = useAuth();
+  const { selectedUniversity } = useUniversity();
+  const { hostels } = useHostel();
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const recentlyPlayed = [
-    {
-      id: '1',
-      title: "Blinding Lights",
-      artist: "The Weeknd",
-      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop",
-    },
-    {
-      id: '2',
-      title: "Watermelon Sugar",
-      artist: "Harry Styles",
-      image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&h=300&fit=crop",
-    },
-    {
-      id: '3',
-      title: "Levitating",
-      artist: "Dua Lipa",
-      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop",
-    },
-  ];
+  const featuredHostels = hostels.slice(0, 3);
+  const nearbyHostels = selectedUniversity 
+    ? hostels.filter(h => h.universityId === selectedUniversity.id).slice(0, 4)
+    : [];
 
-  const madeForYou = [
-    {
-      id: '1',
-      title: "Discover Weekly",
-      description: "Your weekly mixtape of fresh music",
-      image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&h=300&fit=crop",
-    },
-    {
-      id: '2',
-      title: "Release Radar",
-      description: "Catch all the latest music from artists you follow",
-      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop",
-    },
-    {
-      id: '3',
-      title: "Daily Mix 1",
-      description: "The Weeknd, Dua Lipa, Taylor Swift and more",
-      image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&h=300&fit=crop",
-    },
-  ];
-
-  const popularAlbums = [
-    {
-      id: '1',
-      title: "After Hours",
-      artist: "The Weeknd",
-      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop",
-    },
-    {
-      id: '2',
-      title: "Fine Line",
-      artist: "Harry Styles",
-      image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&h=300&fit=crop",
-    },
-    {
-      id: '3',
-      title: "Future Nostalgia",
-      artist: "Dua Lipa",
-      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop",
-    },
+  const quickFilters = [
+    { icon: Wifi, label: "WiFi", value: "WiFi" },
+    { icon: Car, label: "Parking", value: "Parking" },
+    { icon: Dumbbell, label: "Gym", value: "Gym" },
   ];
 
   return (
-    <div className="p-6 space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">
-          Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {user?.displayName}
+    <div className="p-4 space-y-6 max-w-7xl mx-auto">
+      {/* Welcome Section */}
+      <div className="bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-6 text-white">
+        <h1 className="text-2xl font-bold mb-2">
+          Welcome back, {user?.displayName?.split(' ')[0]}! 👋
         </h1>
+        <p className="text-primary-foreground/80 mb-4">
+          Find your perfect student accommodation
+        </p>
+        
+        {!selectedUniversity && (
+          <div className="bg-white/10 backdrop-blur rounded-lg p-4">
+            <p className="text-sm mb-3">First, select your university:</p>
+            <UniversitySelector />
+          </div>
+        )}
       </div>
 
-      <section>
-        <h2 className="text-2xl font-bold text-white mb-4">Recently played</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {recentlyPlayed.map((item) => (
-            <AlbumCard
-              key={item.id}
-              title={item.title}
-              artist={item.artist}
-              image={item.image}
-            />
-          ))}
+      {/* Quick Search */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">Quick Search</h2>
+        <Link to="/search" className="block">
+          <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-xl border border-border hover:bg-muted transition-colors">
+            <Search className="w-5 h-5 text-muted-foreground" />
+            <span className="text-muted-foreground">Search hostels, areas, amenities...</span>
+          </div>
+        </Link>
+        
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {quickFilters.map((filter) => {
+            const Icon = filter.icon;
+            return (
+              <Link
+                key={filter.value}
+                to={`/search?amenity=${filter.value}`}
+                className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full whitespace-nowrap hover:bg-primary/20 transition-colors"
+              >
+                <Icon className="w-4 h-4" />
+                <span className="text-sm font-medium">{filter.label}</span>
+              </Link>
+            );
+          })}
         </div>
-      </section>
+      </div>
 
-      <section>
-        <h2 className="text-2xl font-bold text-white mb-4">Made for you</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {madeForYou.map((playlist) => (
-            <PlaylistCard
-              key={playlist.id}
-              title={playlist.title}
-              description={playlist.description}
-              image={playlist.image}
-            />
+      {/* Featured Hostels */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Featured Hostels</h2>
+          <Link to="/search" className="text-primary text-sm hover:underline">
+            View all
+          </Link>
+        </div>
+        
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {featuredHostels.map((hostel) => (
+            <HostelCard key={hostel.id} hostel={hostel} />
           ))}
         </div>
-      </section>
+      </div>
 
-      <section>
-        <h2 className="text-2xl font-bold text-white mb-4">Popular albums</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {popularAlbums.map((album) => (
-            <AlbumCard
-              key={album.id}
-              title={album.title}
-              artist={album.artist}
-              image={album.image}
-            />
-          ))}
+      {/* Near Your University */}
+      {selectedUniversity && nearbyHostels.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-primary" />
+            <h2 className="text-xl font-semibold">Near {selectedUniversity.name}</h2>
+          </div>
+          
+          <div className="grid gap-4 sm:grid-cols-2">
+            {nearbyHostels.map((hostel) => (
+              <HostelCard key={hostel.id} hostel={hostel} compact />
+            ))}
+          </div>
         </div>
-      </section>
+      )}
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-card border border-border rounded-xl p-4 text-center">
+          <div className="text-2xl font-bold text-primary">{hostels.length}+</div>
+          <div className="text-sm text-muted-foreground">Hostels</div>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-4 text-center">
+          <div className="text-2xl font-bold text-primary">50+</div>
+          <div className="text-sm text-muted-foreground">Universities</div>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-4 text-center">
+          <div className="text-2xl font-bold text-primary">4.5</div>
+          <div className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+            <Star className="w-3 h-3 fill-current text-yellow-500" />
+            Rating
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-4 text-center">
+          <div className="text-2xl font-bold text-primary">24/7</div>
+          <div className="text-sm text-muted-foreground">Support</div>
+        </div>
+      </div>
     </div>
   );
 }

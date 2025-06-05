@@ -1,17 +1,16 @@
 
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Sidebar } from './Sidebar';
-import { TopBar } from './TopBar';
-import { NowPlaying } from './NowPlaying';
+import { BottomNavigation } from './BottomNavigation';
+import { TopHeader } from './TopHeader';
 
 export default function Layout() {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return (
-      <div className="h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="h-screen bg-primary/5 flex items-center justify-center">
+        <div className="text-primary text-xl font-semibold">Loading UniStay...</div>
       </div>
     );
   }
@@ -21,17 +20,14 @@ export default function Layout() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-black text-white">
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
-        <div className="flex flex-col flex-1">
-          <TopBar />
-          <main className="flex-1 overflow-y-auto bg-gradient-to-b from-gray-900 to-black">
-            <Outlet />
-          </main>
+    <div className="h-screen flex flex-col bg-background text-foreground">
+      <TopHeader />
+      <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
+        <div className="animate-fade-in">
+          <Outlet />
         </div>
-      </div>
-      <NowPlaying />
+      </main>
+      <BottomNavigation />
     </div>
   );
 }

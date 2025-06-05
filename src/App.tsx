@@ -4,15 +4,17 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { MusicProvider } from "./contexts/MusicContext";
+import { UniversityProvider } from "./contexts/UniversityContext";
+import { HostelProvider } from "./contexts/HostelContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
-import Library from "./pages/Library";
-import Playlist from "./pages/Playlist";
-import Artist from "./pages/Artist";
-import Album from "./pages/Album";
+import Universities from "./pages/Universities";
+import HostelDetails from "./pages/HostelDetails";
+import Saved from "./pages/Saved";
+import Messages from "./pages/Messages";
+import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -25,20 +27,23 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <MusicProvider>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/" element={<Layout />}>
-                <Route index element={<Home />} />
-                <Route path="search" element={<Search />} />
-                <Route path="library" element={<Library />} />
-                <Route path="playlist/:id" element={<Playlist />} />
-                <Route path="artist/:id" element={<Artist />} />
-                <Route path="album/:id" element={<Album />} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </MusicProvider>
+          <UniversityProvider>
+            <HostelProvider>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Home />} />
+                  <Route path="search" element={<Search />} />
+                  <Route path="universities" element={<Universities />} />
+                  <Route path="hostel/:id" element={<HostelDetails />} />
+                  <Route path="saved" element={<Saved />} />
+                  <Route path="messages" element={<Messages />} />
+                  <Route path="profile" element={<Profile />} />
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </HostelProvider>
+          </UniversityProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
